@@ -1,0 +1,38 @@
+version: '3'
+
+volumes:
+    db:
+
+services:
+
+    postgres:
+        container_name: app_postgres
+        image: postgres:16
+        ports:
+            - '5432:5432'
+        environment:
+            - POSTGRES_DB=app_db
+            - POSTGRES_USER=app_db
+            - POSTGRES_PASSWORD=app_password
+        volumes:
+            - db:/var/lib/postgresql/data
+
+    spring:
+        container_name: app_spring
+        build:
+            context: .
+            dockerfile: ./docker/spring/Dockerfile
+        ports:
+            - '8080:8080'
+        depends_on:
+            - postgres
+
+    angular:
+        container_name: app_angular
+        build:
+            context: .
+            dockerfile: ./docker/angular/Dockerfile
+        ports:
+            - '81:80'
+        depends_on:
+            - spring
